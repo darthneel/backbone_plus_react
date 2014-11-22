@@ -1,0 +1,26 @@
+{
+  "name": "backbone_plus_react",
+  "version": "0.0.0",
+  "description": "Simple Backone.js + React.js application",
+  "main": "server.js",
+  "scripts": {
+    "test": "console.log('hello world')"
+  },
+  "author": "Neel Patel <neelp22@gmail.com> (https://github.com/darthneel)",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "reactify": "^0.17.1",
+    "browserify": "^6.3.2",
+    "vinyl-source-stream": "^1.0.0",
+    "nodemon": "^1.2.1"
+  },
+  "dependencies": {
+    "express": "^4.10.2",
+    "jquery": "^2.1.1",
+    "backbone": "^1.1.2",
+    "underscore": "^1.7.0",
+    "react": "^0.12.1",
+    "ejs": "^1.0.0"
+  }
+}
