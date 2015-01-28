@@ -21,6 +21,9 @@
     "backbone": "^1.1.2",
     "underscore": "^1.7.0",
     "react": "^0.12.1",
-    "ejs": "^1.0.0"
+    "ejs": "^1.0.0",
+    "request": "^2.48.0",
+    "gulp-nodemon": "^1.0.4",
+    "backbone.localstorage": "^1.1.16"
   }
 }
