@@ -11,7 +11,7 @@ InstaApp.initialize = function(){
 		el: $("#pictures")
 	});
 	
-	collection.fetch();
+	//collection.fetch({reset: true});
 
 	console.log(collection)
 

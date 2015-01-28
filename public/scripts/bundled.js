@@ -19,6 +19,7 @@ var Pics = require("../backbone/models/Pics.js");
 
 // React component
 var PicComponment = require("../backbone/components/pic.jsx");
+var FavComponment = require("../backbone/components/favorite.jsx");
 
 // Backbone collection
 var PicsCollection = require("../backbone/collections/PicsCollection.js");
@@ -26,7 +27,9 @@ var FavoritesCollection = require("../backbone/collections/FavoritesCollection.j
 
 //Backbone Views
 var PicsListView = require("../backbone/views/PicsListView.js");
+var FavsListView = require("../backbone/views/FavoritesListView.js");
 var PicView = require("../backbone/views/PicView.js");
+var FavView = require("../backbone/views/FavoriteView.js");
 
 //App init script
 var App = require("../backbone/app.js");
@@ -35,7 +38,7 @@ var App = require("../backbone/app.js");
 var Router = require('../backbone/router.js');
 
 
-},{"../backbone/app.js":156,"../backbone/collections/FavoritesCollection.js":157,"../backbone/collections/PicsCollection.js":158,"../backbone/components/pic.jsx":159,"../backbone/models/Pics.js":160,"../backbone/router.js":161,"../backbone/views/PicView.js":162,"../backbone/views/PicsListView.js":163,"Backbone":2,"backbone.localstorage":4,"jquery":8,"react":154,"underscore":155}],2:[function(require,module,exports){
+},{"../backbone/app.js":156,"../backbone/collections/FavoritesCollection.js":157,"../backbone/collections/PicsCollection.js":158,"../backbone/components/favorite.jsx":159,"../backbone/components/pic.jsx":160,"../backbone/models/Pics.js":161,"../backbone/router.js":162,"../backbone/views/FavoriteView.js":163,"../backbone/views/FavoritesListView.js":164,"../backbone/views/PicView.js":165,"../backbone/views/PicsListView.js":166,"Backbone":2,"backbone.localstorage":4,"jquery":8,"react":154,"underscore":155}],2:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -30827,7 +30830,7 @@ InstaApp.initialize = function(){
 		el: $("#pictures")
 	});
 	
-	collection.fetch();
+	//collection.fetch({reset: true});
 
 	console.log(collection)
 
@@ -30867,6 +30870,25 @@ InstaApp.Collections.PicsCollection = Backbone.Collection.extend({
 
 
 },{}],159:[function(require,module,exports){
+InstaApp.Components.FavComponment = React.createClass({displayName: 'FavComponment',
+	componentWillUnmount: function(){
+		console.log("component unmounting")
+	},
+	componentDidMount: function(){
+		console.log("component mounted");
+	},
+	render: function(){
+		return (
+			React.createElement("li", {className: "favlistitem"}, 
+				React.createElement("img", {src: this.props.model.attributes.images.thumbnail.url}), 
+				
+				React.createElement("button", {className: "button", onClick: this.props.viewDelete}, "Delete"), 				
+				React.createElement("button", {className: "button", onClick: this.props.unfavoriteHandler}, "Remove from Favorites")				
+			)
+		);
+	}
+});
+},{}],160:[function(require,module,exports){
 InstaApp.Components.PicComponment = React.createClass({displayName: 'PicComponment',
 	componentWillUnmount: function(){
 		console.log("component unmounting")
@@ -30886,7 +30908,7 @@ InstaApp.Components.PicComponment = React.createClass({displayName: 'PicComponme
 		);
 	}
 });
-},{}],160:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 
 InstaApp.Models.Pic = Backbone.Model.extend({
 	initialize: function(){
@@ -30894,7 +30916,13 @@ InstaApp.Models.Pic = Backbone.Model.extend({
 	},
 });
 
-},{}],161:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
+function unmountAllComponents(els){
+	_.each(els, function(el){
+		React.unmountComponentAtNode(el);
+	})
+};
+
 InstaApp.Router.AppRouter = Backbone.Router.extend({
   routes: {
     "": "home",
@@ -30905,6 +30933,8 @@ InstaApp.Router.AppRouter = Backbone.Router.extend({
 var router = new InstaApp.Router.AppRouter();
 
 router.on('route:home', function(){
+	$('header').text("Popular Instagram Pictures!")
+
 	if (initialAppLoad == false){
 		InstaApp.initialize();
 	} else {
@@ -30913,15 +30943,67 @@ router.on('route:home', function(){
 });
 
 router.on('route:favorites', function(){
-	console.log("Sweet favorites bro")
+
+	var listItems = document.getElementsByClassName("listitem");
+	unmountAllComponents(listItems);
+
+	$("#pictures").empty();
+
+	var listView = new InstaApp.Views.FavoritesListView({
+		collection: favorites,
+		el: $("#pictures")
+	});
+	$('header').text("Favorites")
+	// listView.render();
 });
 
 
 
-},{}],162:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
+InstaApp.Views.FavoriteView = Backbone.View.extend({
+	initialize: function(){
+		this.listenTo( this.model, "destroy", this.remove );
+	},
+	tagName: 'li',
+	render: function() {
+		this.component = React.render(
+			React.createElement(InstaApp.Components.FavComponment, {model: this.model, viewDelete: this.clickDelete.bind(this), unfavoriteHandler: this.unfavorite.bind(this)}),
+			this.el
+		)
+
+		return this;
+	},
+	clickDelete: function(){
+		React.unmountComponentAtNode(this.el);
+		this.model.destroy();
+	},
+	unfavorite: function(){
+		favorites.localStorage.destroy(this.model);
+	}
+});
+},{}],164:[function(require,module,exports){
+InstaApp.Views.FavoritesListView = Backbone.View.extend({
+	initialize: function(){
+		this.collection.fetch().done(this.render.bind(this));
+		this.listenTo(this.collection, 'destroy', this.render);
+
+	},
+	render: function() {
+		var self = this;
+		this.$el.empty()
+
+		_.each(this.collection.models, function(model) {
+			var picView = new InstaApp.Views.FavoriteView({ model: model });
+			self.$el.append(picView.render().$el);
+		});
+	}
+});
+
+
+
+},{}],165:[function(require,module,exports){
 InstaApp.Views.PicView = Backbone.View.extend({
 	initialize: function(){
-		this.listenTo( this.model, "change", this.render )
 		this.listenTo( this.model, "destroy", this.remove );
 	},
 	tagName: 'li',
@@ -30938,14 +31020,16 @@ InstaApp.Views.PicView = Backbone.View.extend({
 		this.model.destroy();
 	},
 	addFavorite: function(){
-		favorites.create(this.model);
-		// favorites.sync();
+		favorites.add(this.model);
+		favorites.localStorage.create(this.model);
 	}
 });
-},{}],163:[function(require,module,exports){
+},{}],166:[function(require,module,exports){
 InstaApp.Views.PicsListView = Backbone.View.extend({
 	initialize: function(){
-		this.listenTo(this.collection, 'add', this.render);
+		this.collection.fetch().done(this.render.bind(this));
+		this.listenTo(this.collection, 'destroy', this.render);
+
 	},
 	render: function() {
 		// console.log("rendering")

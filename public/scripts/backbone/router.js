@@ -1,3 +1,9 @@
+function unmountAllComponents(els){
+	_.each(els, function(el){
+		React.unmountComponentAtNode(el);
+	})
+};
+
 InstaApp.Router.AppRouter = Backbone.Router.extend({
   routes: {
     "": "home",
@@ -8,6 +14,8 @@ InstaApp.Router.AppRouter = Backbone.Router.extend({
 var router = new InstaApp.Router.AppRouter();
 
 router.on('route:home', function(){
+	$('header').text("Popular Instagram Pictures!")
+
 	if (initialAppLoad == false){
 		InstaApp.initialize();
 	} else {
@@ -16,7 +24,18 @@ router.on('route:home', function(){
 });
 
 router.on('route:favorites', function(){
-	console.log("Sweet favorites bro")
+
+	var listItems = document.getElementsByClassName("listitem");
+	unmountAllComponents(listItems);
+
+	$("#pictures").empty();
+
+	var listView = new InstaApp.Views.FavoritesListView({
+		collection: favorites,
+		el: $("#pictures")
+	});
+	$('header').text("Favorites")
+	// listView.render();
 });
 
 
