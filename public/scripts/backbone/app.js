@@ -2,17 +2,20 @@
 InstaApp.initialize = function(){
 
 	collection = new InstaApp.Collections.PicsCollection();
-	favorites = new InstaApp.Collections.FavoritesCollection();
 
-	favorites.fetch();
+	if(favorites){
+		return true
+	} else {
+		favorites = favorites || new InstaApp.Collections.FavoritesCollection();
+
+		favorites.fetch();
+	};
 
 	var listView = new InstaApp.Views.PicsListView({
 		collection: collection,
 		el: $("#pictures")
 	});
 	
-	//collection.fetch({reset: true});
-
 	console.log(collection)
 
 	console.log(listView);

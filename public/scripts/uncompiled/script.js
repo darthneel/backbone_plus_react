@@ -10,7 +10,8 @@ window.React = require('react');
 var InstaApp = InstaApp || { Models: {}, Collections: {}, Views: {}, Router: {}, Components: {} };
 window.InstaApp = InstaApp;
 window.collection;
-window.favorites;
+var favorites;
+window.favorites = favorites;
 window.initialAppLoad = false;
 
 // Backbone model

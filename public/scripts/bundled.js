@@ -11,7 +11,8 @@ window.React = require('react');
 var InstaApp = InstaApp || { Models: {}, Collections: {}, Views: {}, Router: {}, Components: {} };
 window.InstaApp = InstaApp;
 window.collection;
-window.favorites;
+var favorites;
+window.favorites = favorites;
 window.initialAppLoad = false;
 
 // Backbone model
@@ -30821,17 +30822,20 @@ module.exports=require(3)
 InstaApp.initialize = function(){
 
 	collection = new InstaApp.Collections.PicsCollection();
-	favorites = new InstaApp.Collections.FavoritesCollection();
 
-	favorites.fetch();
+	if(favorites){
+		return true
+	} else {
+		favorites = favorites || new InstaApp.Collections.FavoritesCollection();
+
+		favorites.fetch();
+	};
 
 	var listView = new InstaApp.Views.PicsListView({
 		collection: collection,
 		el: $("#pictures")
 	});
 	
-	//collection.fetch({reset: true});
-
 	console.log(collection)
 
 	console.log(listView);
@@ -30943,18 +30947,24 @@ router.on('route:home', function(){
 });
 
 router.on('route:favorites', function(){
-
 	var listItems = document.getElementsByClassName("listitem");
 	unmountAllComponents(listItems);
 
 	$("#pictures").empty();
+	// debugger
+	if(favorites){
+		console.log("exists")
+	} else {
+		favorites = favorites || new InstaApp.Collections.FavoritesCollection();
 
+		favorites.fetch();
+	};
+	// debugger
 	var listView = new InstaApp.Views.FavoritesListView({
 		collection: favorites,
 		el: $("#pictures")
 	});
 	$('header').text("Favorites")
-	// listView.render();
 });
 
 
