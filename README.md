@@ -1,0 +1,2 @@
+- Node/Express application using Backbone.js and React.js
+  - Application uses Instagrams APi with the above technologies to display and trending Instagram pictures and allows them to be favorited
